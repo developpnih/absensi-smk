@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Login — Absensi SMK Muhammadiyah Bojong</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-header">
+        <svg class="sun-mark" viewBox="0 0 24 24" style="width:30px;height:30px;margin:0 auto 12px;display:block;"><circle cx="12" cy="12" r="4.2"/><line x1="12" y1="1" x2="12" y2="4.5"/><line x1="12" y1="19.5" x2="12" y2="23"/><line x1="1" y1="12" x2="4.5" y2="12"/><line x1="19.5" y1="12" x2="23" y2="12"/><line x1="4.2" y1="4.2" x2="6.6" y2="6.6"/><line x1="17.4" y1="17.4" x2="19.8" y2="19.8"/><line x1="4.2" y1="19.8" x2="6.6" y2="17.4"/><line x1="17.4" y1="6.6" x2="19.8" y2="4.2"/></svg>
+        <div class="sekolah">SMK Muhammadiyah Bojong</div>
+        <h1 style="margin:4px 0 0;font-size:1.3rem;">Sistem Absensi</h1>
+      </div>
+      <div class="login-body">
+        <div class="role-tabs">
+          <div class="role-tab active" data-role="guru">Guru</div>
+          <div class="role-tab" data-role="pengurus">Pengurus</div>
+          <div class="role-tab" data-role="admin">Admin</div>
+        </div>
+
+        <form id="loginForm">
+          <div class="field">
+            <label for="idInput" id="idLabel">ID Guru</label>
+            <input type="text" id="idInput" placeholder="Contoh: GR001" required />
+          </div>
+          <div class="field">
+            <label for="pinInput">PIN</label>
+            <input type="password" id="pinInput" inputmode="numeric" placeholder="••••••" required />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="loginBtn">Masuk</button>
+        </form>
+        <p class="muted text-center mt-16">Lupa PIN? Hubungi admin sekolah.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/config.js"></script>
+  <script src="assets/api.js"></script>
+  <script src="assets/auth.js"></script>
+  <script>
+    let currentRole = 'guru';
+    const idLabels = { guru: 'ID Guru', pengurus: 'ID Pengurus', admin: 'ID Admin' };
+    const redirectMap = { guru: 'guru.html', pengurus: 'pengurus.html', admin: 'admin.html' };
+
+    document.querySelectorAll('.role-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentRole = tab.dataset.role;
+        document.getElementById('idLabel').textContent = idLabels[currentRole];
+      });
+    });
+
+    // Kalau sudah login, langsung lempar ke dashboard masing-masing
+    const existing = getSession();
+    if (existing && redirectMap[existing.role]) {
+      window.location.href = redirectMap[existing.role];
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('loginBtn');
+      btn.disabled = true;
+      btn.textContent = 'Memeriksa...';
+      try {
+        const id = document.getElementById('idInput').value.trim();
+        const pin = document.getElementById('pinInput').value.trim();
+        const user = await apiCall('login', { role: currentRole, id, pin });
+        saveSession(currentRole, user);
+        window.location.href = redirectMap[currentRole];
+      } catch (err) {
+        showToast(err.message, true);
+        btn.disabled = false;
+        btn.textContent = 'Masuk';
+      }
+    });
+  </script>
+</body>
+</html>

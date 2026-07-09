@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard Admin — Absensi SMK Muhammadiyah Bojong</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css" />
+<script src="assets/qrcode.min.js"></script>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><svg class="sun-mark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><line x1="12" y1="1" x2="12" y2="4.5"/><line x1="12" y1="19.5" x2="12" y2="23"/><line x1="1" y1="12" x2="4.5" y2="12"/><line x1="19.5" y1="12" x2="23" y2="12"/><line x1="4.2" y1="4.2" x2="6.6" y2="6.6"/><line x1="17.4" y1="17.4" x2="19.8" y2="19.8"/><line x1="4.2" y1="19.8" x2="6.6" y2="17.4"/><line x1="17.4" y1="6.6" x2="19.8" y2="4.2"/></svg> Absensi Admin</div>
+      <button class="btn btn-outline" style="color:var(--paper);border-color:var(--sun-500);" onclick="logout()">Keluar</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="role-tabs main-nav">
+      <div class="role-tab active" data-tab="ringkasan"><span class="role-tab-ic">📊</span>Ringkasan</div>
+      <div class="role-tab" data-tab="absenGuru"><span class="role-tab-ic">🧑‍🏫</span>Absensi Guru</div>
+      <div class="role-tab" data-tab="absenSiswa"><span class="role-tab-ic">🎒</span>Absensi Siswa</div>
+      <div class="role-tab" data-tab="rekapBulanan"><span class="role-tab-ic">📅</span>Rekap Bulanan</div>
+      <div class="role-tab" data-tab="poin"><span class="role-tab-ic">⚠️</span>Poin Pelanggaran</div>
+      <div class="role-tab" data-tab="suratPanggilan"><span class="role-tab-ic">✉️</span>Surat Panggilan</div>
+      <div class="role-tab" data-tab="kartuSiswa"><span class="role-tab-ic">🪪</span>Kartu Siswa</div>
+      <div class="role-tab" data-tab="master"><span class="role-tab-ic">🗂️</span>Data Master</div>
+      <div class="role-tab" data-tab="settings"><span class="role-tab-ic">⚙️</span>Pengaturan</div>
+    </div>
+
+    <!-- RINGKASAN -->
+    <div id="tab-ringkasan" class="tab-panel">
+      <div class="grid grid-3">
+        <div class="card stat-card">
+          <div><div class="muted">Guru absen masuk hari ini</div><h2 id="statGuruMasuk" class="stat-num">-</h2></div>
+          <div class="stat-ic">🧑‍🏫</div>
+        </div>
+        <div class="card stat-card">
+          <div><div class="muted">Siswa datang hari ini</div><h2 id="statSiswaMasuk" class="stat-num">-</h2></div>
+          <div class="stat-ic">🎒</div>
+        </div>
+        <div class="card stat-card">
+          <div><div class="muted">Izin sedang berjalan</div><h2 id="statIzinAktif" class="stat-num">-</h2></div>
+          <div class="stat-ic">🚶</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABSEN GURU -->
+    <div id="tab-absenGuru" class="tab-panel hidden">
+      <div class="card">
+        <h3 style="margin-top:0;">Absen Guru Manual</h3>
+        <p class="muted">Jaga-jaga kalau guru tidak bawa HP / tidak bisa absen mandiri lewat kamera & GPS. Absen ini langsung dicatat oleh admin tanpa foto & lokasi.</p>
+        <div class="grid grid-3">
+          <div class="field">
+            <label>Guru</label>
+            <select id="manualIdGuru"><option value="">-- pilih guru --</option></select>
+          </div>
+          <div class="field">
+            <label>Status</label>
+            <select id="manualStatusGuru">
+              <option value="Masuk">Masuk</option>
+              <option value="Pulang">Pulang</option>
+            </select>
+          </div>
+          <div class="field" style="display:flex;align-items:flex-end;">
+            <button class="btn btn-primary btn-block" id="btnAbsenGuruManual">Catat Absen</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Catatan (opsional)</label>
+          <input id="manualCatatanGuru" placeholder="Contoh: HP ketinggalan di rumah" />
+        </div>
+        <div id="manualAbsenGuruResult"></div>
+      </div>
+      <div class="card">
+        <div class="flex-between">
+          <h3 style="margin:0;">Rekap Absensi Guru</h3>
+          <input type="date" id="tglGuru" style="width:auto;" />
+        </div>
+        <div id="tabelAbsenGuru" class="mt-16"><p class="muted">Memuat...</p></div>
+      </div>
+    </div>
+
+    <!-- ABSEN SISWA -->
+    <div id="tab-absenSiswa" class="tab-panel hidden">
+      <div class="card">
+        <h3 style="margin-top:0;">Absen Siswa Tidak Berangkat</h3>
+        <div class="grid grid-3">
+          <div class="field"><label>ID Siswa</label><input id="manualIdSiswa" placeholder="Contoh: SW045" /></div>
+          <div class="field">
+            <label>Keterangan</label>
+            <select id="manualKeterangan">
+              <option value="Sakit">Sakit</option>
+              <option value="Izin">Izin</option>
+              <option value="Alpa">Alpa</option>
+            </select>
+          </div>
+          <div class="field" style="display:flex;align-items:flex-end;">
+            <button class="btn btn-primary btn-block" id="btnAbsenManual">Simpan</button>
+          </div>
+        </div>
+        <div id="manualAbsenResultAdmin"></div>
+      </div>
+      <div class="card">
+        <div class="flex-between">
+          <h3 style="margin:0;">Rekap Absensi Siswa</h3>
+          <input type="date" id="tglSiswa" style="width:auto;" />
+        </div>
+        <div id="tabelAbsenSiswa" class="mt-16"><p class="muted">Memuat...</p></div>
+      </div>
+    </div>
+
+    <!-- REKAP BULANAN -->
+    <div id="tab-rekapBulanan" class="tab-panel hidden">
+      <div class="card">
+        <div class="role-tabs">
+          <div class="role-tab active" data-rekap="guru">Guru</div>
+          <div class="role-tab" data-rekap="siswa">Siswa</div>
+        </div>
+        <div class="grid grid-3 mt-16">
+          <div class="field">
+            <label>Bulan</label>
+            <select id="rekapBulan">
+              <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+              <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+              <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+              <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+            </select>
+          </div>
+          <div class="field"><label>Tahun</label><input type="number" id="rekapTahun" /></div>
+          <div class="field" id="rekapKelasWrap" style="display:none;"><label>Kelas (opsional)</label><input id="rekapKelas" placeholder="Contoh: XII RPL 1" /></div>
+        </div>
+        <div class="grid grid-2">
+          <button class="btn btn-primary btn-block" id="btnMuatRekap">Tampilkan Rekap</button>
+          <button class="btn btn-download btn-block" id="btnDownloadRekap" disabled>⬇ Unduh CSV</button>
+        </div>
+        <div id="tabelRekapBulanan" class="mt-16"><p class="muted">Pilih bulan & tahun, lalu klik Tampilkan Rekap.</p></div>
+      </div>
+    </div>
+
+    <!-- POIN PELANGGARAN -->
+    <div id="tab-poin" class="tab-panel hidden">
+      <div class="card">
+        <h3 style="margin-top:0;">Tambah Pelanggaran Manual</h3>
+        <div class="grid grid-2">
+          <div class="field"><label>ID Siswa</label><input id="poinIdSiswa" placeholder="Contoh: SW045" /></div>
+          <div class="field"><label>Jenis Pelanggaran</label><input id="poinJenis" placeholder="Contoh: Tidak pakai atribut" /></div>
+          <div class="field"><label>Poin</label><input id="poinNilai" type="number" value="5" /></div>
+          <div class="field"><label>Keterangan</label><input id="poinKet" placeholder="Opsional" /></div>
+        </div>
+        <button class="btn btn-primary" id="btnTambahPoin">Simpan Pelanggaran</button>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">Rekap Total Poin per Siswa</h3>
+        <div id="tabelPoin"><p class="muted">Memuat...</p></div>
+      </div>
+    </div>
+
+    <!-- SURAT PANGGILAN ORANG TUA -->
+    <div id="tab-suratPanggilan" class="tab-panel hidden">
+      <div class="card">
+        <h3 style="margin-top:0;">Buat Surat Panggilan Orang Tua</h3>
+        <p class="muted">Masukkan ID Siswa untuk melihat total poin pelanggaran & membuat surat panggilan otomatis.</p>
+        <div class="grid grid-2">
+          <div class="field"><label>ID Siswa</label><input id="suratIdSiswa" placeholder="Contoh: SW045" /></div>
+          <div class="field" style="display:flex;align-items:flex-end;">
+            <button class="btn btn-primary btn-block" id="btnMuatSurat">Muat Data Siswa</button>
+          </div>
+        </div>
+        <div class="grid grid-2">
+          <div class="field"><label>Tanggal Surat</label><input type="date" id="suratTanggal" /></div>
+          <div class="field"><label>Hari/Tanggal Dipanggil Menghadap</label><input id="suratJadwal" placeholder="Contoh: Senin, 20 Juli 2026 pukul 09.00 WIB" /></div>
+        </div>
+        <div class="field"><label>Nama Kepala Sekolah</label><input id="suratKepsek" placeholder="Nama & gelar Kepala Sekolah" /></div>
+        <button class="btn btn-gold" id="btnBuatSurat" disabled>Buat Pratinjau Surat</button>
+      </div>
+      <div class="card hidden" id="cardPratinjauSurat">
+        <div class="flex-between">
+          <h3 style="margin:0;">Pratinjau Surat</h3>
+          <button class="btn btn-download" id="btnCetakSurat">🖨️ Cetak / Simpan PDF</button>
+        </div>
+        <div id="printArea" class="letter-preview mt-16"></div>
+      </div>
+    </div>
+
+    <!-- KARTU SISWA (QR otomatis) -->
+    <div id="tab-kartuSiswa" class="tab-panel hidden">
+      <div class="card no-print">
+        <h3 style="margin-top:0;">Cetak Kartu Barcode/QR Siswa</h3>
+        <p class="muted">QR code dibuat otomatis dari kode <code>Barcode_ID</code> tiap siswa (kalau kosong, otomatis pakai ID Siswa).
+          Kartu ini yang nanti di-scan pengurus lewat kamera HP di gerbang/saat izin.</p>
+        <div class="grid grid-2">
+          <div class="field"><label>Filter Kelas (opsional)</label><input id="kartuKelas" placeholder="Contoh: XII RPL 1 — kosongkan untuk semua" /></div>
+          <div class="field" style="display:flex;align-items:flex-end;gap:10px;">
+            <button class="btn btn-primary btn-block" id="btnMuatKartu">Muat & Buat QR</button>
+            <button class="btn btn-download btn-block" id="btnCetakKartu" disabled>🖨️ Cetak Semua</button>
+          </div>
+        </div>
+        <p class="muted" id="kartuStatus"></p>
+      </div>
+      <div id="kartuGrid" class="kartu-grid"></div>
+    </div>
+
+    <!-- DATA MASTER -->
+    <div id="tab-master" class="tab-panel hidden">
+      <div class="card">
+        <div class="role-tabs">
+          <div class="role-tab active" data-master="Siswa">Siswa</div>
+          <div class="role-tab" data-master="Guru">Guru</div>
+          <div class="role-tab" data-master="Pengurus">Pengurus</div>
+        </div>
+        <div id="formMaster" class="grid grid-2 mt-16"></div>
+        <button class="btn btn-primary mt-16" id="btnTambahMaster">Tambah Data</button>
+        <div id="tabelMaster" class="mt-16"><p class="muted">Memuat...</p></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="tab-settings" class="tab-panel hidden">
+      <div class="card">
+        <h3 style="margin-top:0;">Titik Lokasi & Radius Sekolah</h3>
+        <div class="grid grid-2">
+          <div class="field"><label>Latitude</label><input id="setLat" /></div>
+          <div class="field"><label>Longitude</label><input id="setLng" /></div>
+          <div class="field"><label>Radius (meter)</label><input id="setRadius" type="number" /></div>
+          <div class="field"><label>Poin Telat Izin</label><input id="setPoinIzin" type="number" /></div>
+          <div class="field"><label>Jam Masuk Batas (Telat setelah jam ini)</label><input id="setJamMasuk" type="time" /></div>
+          <div class="field"><label>Poin Telat Masuk Sekolah</label><input id="setPoinTelatMasuk" type="number" /></div>
+        </div>
+        <button class="btn btn-gold" id="btnSimpanSettings">Simpan Pengaturan</button>
+        <p class="muted mt-16">Tips: buka Google Maps, klik lokasi gerbang sekolah, salin koordinat yang muncul ke kolom Latitude/Longitude.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/config.js"></script>
+  <script src="assets/api.js"></script>
+  <script src="assets/auth.js"></script>
+  <script src="assets/admin.js"></script>
+</body>
+</html>

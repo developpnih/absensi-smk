@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard Pengurus — Absensi SMK Muhammadiyah Bojong</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css" />
+<script src="assets/html5-qrcode.min.js"></script>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><svg class="sun-mark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><line x1="12" y1="1" x2="12" y2="4.5"/><line x1="12" y1="19.5" x2="12" y2="23"/><line x1="1" y1="12" x2="4.5" y2="12"/><line x1="19.5" y1="12" x2="23" y2="12"/><line x1="4.2" y1="4.2" x2="6.6" y2="6.6"/><line x1="17.4" y1="17.4" x2="19.8" y2="19.8"/><line x1="4.2" y1="19.8" x2="6.6" y2="17.4"/><line x1="17.4" y1="6.6" x2="19.8" y2="4.2"/></svg> Absensi Pengurus</div>
+      <button class="btn btn-outline" style="color:var(--paper);border-color:var(--sun-500);" onclick="logout()">Keluar</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <p class="muted" id="namaPengurus"></p>
+
+    <div class="card">
+      <div class="role-tabs">
+        <div class="role-tab active" data-mode="absen">Absen Gerbang</div>
+        <div class="role-tab" data-mode="izinMulai">Mulai Izin</div>
+        <div class="role-tab" data-mode="izinSelesai">Siswa Kembali</div>
+      </div>
+
+      <div id="absenPanel">
+        <label>Status yang dicatat</label>
+        <div class="grid grid-2 mt-16" style="margin-bottom:14px;">
+          <button class="btn btn-primary btn-block absen-status-btn active" data-status="Masuk">Datang</button>
+          <button class="btn btn-outline btn-block absen-status-btn" data-status="Pulang">Pulang</button>
+        </div>
+      </div>
+
+      <div id="izinMulaiPanel" class="hidden">
+        <label for="durasiIzin">Durasi izin (menit)</label>
+        <select id="durasiIzin">
+          <option value="10">10 menit</option>
+          <option value="15" selected>15 menit</option>
+          <option value="20">20 menit</option>
+          <option value="30">30 menit</option>
+          <option value="60">60 menit</option>
+        </select>
+      </div>
+
+      <p class="muted mt-16">Arahkan kamera ke barcode kartu siswa.</p>
+      <div id="scanner-view"></div>
+      <div id="scanResult"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">Izin Sedang Berjalan</h3>
+      <div id="izinAktifList"><p class="muted">Memuat...</p></div>
+    </div>
+  </div>
+
+  <script src="assets/config.js"></script>
+  <script src="assets/api.js"></script>
+  <script src="assets/auth.js"></script>
+  <script src="assets/scanner.js"></script>
+  <script src="assets/pengurus.js"></script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard Guru — Absensi SMK Muhammadiyah Bojong</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><svg class="sun-mark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><line x1="12" y1="1" x2="12" y2="4.5"/><line x1="12" y1="19.5" x2="12" y2="23"/><line x1="1" y1="12" x2="4.5" y2="12"/><line x1="19.5" y1="12" x2="23" y2="12"/><line x1="4.2" y1="4.2" x2="6.6" y2="6.6"/><line x1="17.4" y1="17.4" x2="19.8" y2="19.8"/><line x1="4.2" y1="19.8" x2="6.6" y2="17.4"/><line x1="17.4" y1="6.6" x2="19.8" y2="4.2"/></svg> Absensi Guru</div>
+      <button class="btn btn-outline" style="color:var(--paper);border-color:var(--sun-500);" onclick="logout()">Keluar</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <div class="flex-between">
+        <div>
+          <h2 id="namaGuru" style="margin:0;">-</h2>
+          <p class="muted" id="tanggalHariIni" style="margin:4px 0 0;"></p>
+        </div>
+        <div id="statusBadges"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">Absen Sekarang</h3>
+      <p class="muted">Ambil foto & pastikan lokasi HP kamu aktif. Sistem otomatis mengecek jarak ke lokasi sekolah.</p>
+
+      <div id="cameraBox">
+        <video id="video" autoplay playsinline style="width:100%;border-radius:10px;background:#000;max-height:320px;object-fit:cover;"></video>
+        <canvas id="canvas" class="hidden"></canvas>
+      </div>
+      <img id="previewImg" class="hidden" style="width:100%;border-radius:10px;margin-top:10px;" />
+
+      <div class="grid grid-2 mt-16">
+        <button class="btn btn-outline btn-block" id="btnAmbilFoto">📷 Ambil Foto</button>
+        <button class="btn btn-outline btn-block hidden" id="btnUlangFoto">↺ Ambil Ulang</button>
+      </div>
+
+      <p class="muted mt-16" id="lokasiInfo">Mengambil titik lokasi...</p>
+
+      <div class="grid grid-2 mt-16">
+        <button class="btn btn-primary btn-block" id="btnMasuk" disabled>Absen Masuk</button>
+        <button class="btn btn-gold btn-block" id="btnPulang" disabled>Absen Pulang</button>
+      </div>
+    </div>
+    <div class="card hidden" id="cardBK">
+      <div class="flex-between">
+        <h3 style="margin:0;">Poin Pelanggaran Siswa (BK)</h3>
+        <button class="btn btn-download btn-sm" id="btnDownloadPoinBK">⬇ Unduh CSV</button>
+      </div>
+      <p class="muted">Rekap total poin pelanggaran seluruh siswa, khusus untuk Guru BK.</p>
+      <div class="field">
+        <label>Cari nama / kelas</label>
+        <input type="text" id="cariPoinBK" placeholder="Ketik nama atau kelas..." />
+      </div>
+      <div id="tabelPoinBK" class="mt-16"><p class="muted">Memuat...</p></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">Absen Siswa Tidak Berangkat</h3>
+      <p class="muted">Untuk siswa yang sakit, izin, atau tidak hadir tanpa keterangan (alpa).</p>
+      <div class="field">
+        <label for="cariSiswa">Cari nama siswa</label>
+        <input type="text" id="cariSiswa" placeholder="Ketik nama atau kelas..." />
+      </div>
+      <div class="field">
+        <label for="pilihSiswa">Pilih Siswa</label>
+        <select id="pilihSiswa"><option value="">-- pilih siswa --</option></select>
+      </div>
+      <div class="grid grid-3">
+        <button class="btn btn-outline btn-block ket-btn" data-ket="Sakit">Sakit</button>
+        <button class="btn btn-outline btn-block ket-btn" data-ket="Izin">Izin</button>
+        <button class="btn btn-outline btn-block ket-btn" data-ket="Alpa">Alpa</button>
+      </div>
+      <div id="manualAbsenResult" class="mt-16"></div>
+    </div>
+  </div>
+
+  <script src="assets/config.js"></script>
+  <script src="assets/api.js"></script>
+  <script src="assets/auth.js"></script>
+  <script src="assets/guru.js"></script>
+</body>
+</html>
